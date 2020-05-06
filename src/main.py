@@ -94,14 +94,11 @@ def main():
 
     # Создаем холст
     canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT)
-    # canvas.bind("<Button-1>", canvas_callback)
     canvas.grid(row=1, column=0, columnspan=4)
 
     menu = Menu()
 
     run_game()
-
-    # print("Exit main")
 
     root.mainloop()
 
