@@ -14,7 +14,7 @@ class Ball:
         self.dx = 0 if dx is None else dx
         self.dy = 2 if dy is None else dy
 
-        self.color = choice(['blue', 'green', 'red', 'brown'])
+        self.color = choice(['blue2', 'dodger blue', 'green2', 'red', 'yellow3', 'oliveDrab1', 'orange', 'coral'])
 
         self.ball_id = canvas.create_oval(self.x - self.R,
                                           self.y - self.R,
@@ -85,21 +85,24 @@ def motion():
     # TODO: Сначала добавляем несколько шариков одновременно на экране
     # TODO: Затем ускоряем падение шариков
 
+    is_need_ball = False    # Флаг определяющий нужно ли создавать еще шар
     for ball in balls:
         if ball.ball_exist:
             ball.move()
-        else:       # Если шарик лопнул, увеличиваем очки на 2 и создаем новый шарик
+        else:               # Если шарик лопнул, увеличиваем очки на 1 и поднимаем флаг на создание нового шарика
             balls.remove(ball)
             canvas.delete(ball.ball_id)
-            menu.score_change(+2)
-            create_ball()
+            menu.score_change(+1)
+            is_need_ball = True
 
-        if ball.y > HEIGHT + ball.R:    # Если шарик вышел за границы экрана - уменьшаем очки на 1 и создаем новый шарик
-            balls.remove(ball)
+        if ball.y > HEIGHT + ball.R:    # Если шарик вышел за границы экрана - уменьшаем очки на 2
+            balls.remove(ball)          # и поднимаем флаг на создание нового шарика
             canvas.delete(ball)
-            menu.score_change(-1)
+            menu.score_change(-2)
+            is_need_ball = True
+    else:                           # Продолжаем если не было событий
+        if is_need_ball:
             create_ball()
-    else:                           # Иначе продолжаем
         root.after(25, motion)
 
 
