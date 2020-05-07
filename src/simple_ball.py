@@ -78,7 +78,7 @@ class Menu:
         self.val_life_label['text'] = str(self.val_life_num)
 
 
-def create_ball(dx, dy):
+def create_ball(dx=0, dy=2):
     """
     Создаем новый объект шарик
 
@@ -86,33 +86,33 @@ def create_ball(dx, dy):
     :param dy: Шаг смещения по оси у
     :return: Объект шар
     """
-    global ball_id
-    ball_id = Ball(dx, dy)
+    global ball
+    ball = Ball(dx, dy)
 
 
 def motion():
     # TODO: Сначала добавляем несколько шариков одновременно на экране
     # TODO: Затем ускоряем падение шариков
-    ball_id.move()
+    ball.move()
 
-    # Если шарик лопнул, увеличиваем очки на 3 и перезапускаем
-    if len(ball_id.get_coord()) == 0:
-        menu.score_increase(3)
-        create_ball(0, 2)
+    # Если шарик лопнул, увеличиваем очки на 2 и перезапускаем
+    if len(ball.get_coord()) == 0:
+        menu.score_increase(2)
+        create_ball()
 
     # Если шарик НЕ вышел за границы экрана - продолжаем
-    if len(ball_id.get_coord()) > 0 \
-            and int(ball_id.get_coord()[1]) < HEIGHT + ball_id.R:
+    if len(ball.get_coord()) > 0 \
+            and int(ball.get_coord()[1]) < HEIGHT + ball.R:
         root.after(25, motion)
     else:   # Иначе, уменьшаем очки на 1 и перезапускаем
-        canvas.delete(ball_id)
+        canvas.delete(ball)
         menu.score_decrease(1)
-        create_ball(0, 2)
+        create_ball()
         motion()
 
 
 def main():
-    global root, canvas, menu, ball_id
+    global root, canvas, menu, ball
 
     root = tk.Tk()
 
@@ -121,7 +121,7 @@ def main():
 
     menu = Menu()
 
-    create_ball(0, 2)
+    create_ball()
     motion()
 
     root.mainloop()
