@@ -86,16 +86,17 @@ def create_ball(dx=0, dy=2):
     :param dy: Шаг смещения по оси у
     :return: Объект шар
     """
-    global ball
-    ball = Ball(dx, dy)
+    balls.append(Ball(dx, dy))
 
 
 def motion():
     # TODO: Сначала добавляем несколько шариков одновременно на экране
     # TODO: Затем ускоряем падение шариков
-    ball.move()
+    # FIXME: Не понятно почему создается два шара
+    for ball in balls:
+        ball.move()
 
-    # Если шарик лопнул, увеличиваем очки на 2 и перезапускаем
+    # Если шарик лопнул, увеличиваем очки на 2 и создаем новый шарик
     if len(ball.get_coord()) == 0:
         menu.score_increase(2)
         create_ball()
@@ -112,7 +113,8 @@ def motion():
 
 
 def main():
-    global root, canvas, menu, ball
+    global root, canvas
+    global menu, balls
 
     root = tk.Tk()
 
@@ -121,6 +123,7 @@ def main():
 
     menu = Menu()
 
+    balls = []
     create_ball()
     motion()
 
