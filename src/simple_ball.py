@@ -7,6 +7,7 @@ HEIGHT = 400
 
 class Ball:
     def __init__(self, dx, dy):
+        self.ball_exist = True
         self.R = randint(20, 30)
         self.x = randint(self.R, WIDTH-self.R)
         self.y = self.R
@@ -23,13 +24,13 @@ class Ball:
         canvas.tag_bind(self.ball_id, '<ButtonPress-1>', func=self.delete_ball)
 
     def move(self):
+        self.x += self.dx
+        self.y += self.dy
         canvas.move(self.ball_id, self.dx, self.dy)
 
-    def get_coord(self):
-        return canvas.coords(self.ball_id)
-
     def delete_ball(self, *args):
-        canvas.delete(self.ball_id)
+        self.ball_exist = False
+        # canvas.delete(self.ball_id)
 
 
 class Menu:
@@ -51,30 +52,21 @@ class Menu:
         self.label_2.pack(side='left', padx=10, pady=10)
         self.val_life_label.pack(side='left', padx=10, pady=10)
 
-    def score_increase(self, count):
+    def score_change(self, count):
         # Увеличивае кол-во очков на величину count
         self.val_score_num += count
-        self.val_score_label['text'] = str(self.val_score_num)
-
-    def score_decrease(self, count):
-        # Уменьшаем кол-во очков на величину count
-        self.val_score_num -= count
         self.val_score_label['text'] = str(self.val_score_num)
 
         # Если очков меньше нуля, уменьшает жизнь на 1,
         # и восстанавливаем начальное кол-во очков
         if self.val_score_num < 1:
-            self.life_decrease()
-            self. score_increase(10)
+            self.life_change(-1)
+            self.val_score_num = 10
+            self. score_change(0)
 
-    def life_increase(self):
+    def life_change(self, count):    # TODO: Закончить игру при 0 жизней
         # Увеличивает кол-во жизней
-        self.val_life_num += 1
-        self.val_life_label['text'] = str(self.val_life_num)
-
-    def life_decrease(self):    # TODO: Закончить игру при 0 жизней
-        # Уменьшает кол-во жизней
-        self.val_life_num -= 1
+        self.val_life_num += count
         self.val_life_label['text'] = str(self.val_life_num)
 
 
@@ -92,24 +84,23 @@ def create_ball(dx=0, dy=2):
 def motion():
     # TODO: Сначала добавляем несколько шариков одновременно на экране
     # TODO: Затем ускоряем падение шариков
-    # FIXME: Не понятно почему создается два шара
+
     for ball in balls:
-        ball.move()
+        if ball.ball_exist:
+            ball.move()
+        else:       # Если шарик лопнул, увеличиваем очки на 2 и создаем новый шарик
+            balls.remove(ball)
+            canvas.delete(ball.ball_id)
+            menu.score_change(+2)
+            create_ball()
 
-    # Если шарик лопнул, увеличиваем очки на 2 и создаем новый шарик
-    if len(ball.get_coord()) == 0:
-        menu.score_increase(2)
-        create_ball()
-
-    # Если шарик НЕ вышел за границы экрана - продолжаем
-    if len(ball.get_coord()) > 0 \
-            and int(ball.get_coord()[1]) < HEIGHT + ball.R:
+        if ball.y > HEIGHT + ball.R:    # Если шарик вышел за границы экрана - уменьшаем очки на 1 и создаем новый шарик
+            balls.remove(ball)
+            canvas.delete(ball)
+            menu.score_change(-1)
+            create_ball()
+    else:                           # Иначе продолжаем
         root.after(25, motion)
-    else:   # Иначе, уменьшаем очки на 1 и перезапускаем
-        canvas.delete(ball)
-        menu.score_decrease(1)
-        create_ball()
-        motion()
 
 
 def main():
